@@ -1,0 +1,7 @@
+fib_0x1:
+  ros__parameters:
+    action_name: "/fib_0x1/fibonacci"
+
+fib_0x2:
+  ros__parameters:
+    action_name: "/fib_0x2/fibonacci"

@@ -1,0 +1,2 @@
+minimal_action_server:
+  action_name: { type: string, default_value: "fibonacci" }

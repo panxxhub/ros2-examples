@@ -2,7 +2,9 @@
 #define MINIMAL_ACTION_SERVER__MINIMAL_ACTION_SERVER_HPP_
 
 #include "minimal_action_server/visibility_control.h"
+#include "minimal_action_server_params.hpp"
 #include <example_interfaces/action/fibonacci.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/create_server.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
@@ -18,15 +20,21 @@ public:
       const rclcpp::NodeOptions &options = rclcpp::NodeOptions())
       : Node(name, options) {
 
+    try {
+      param_listener_ = std::make_shared<ParamListener>(
+          this->get_node_parameters_interface());
+      params_ = param_listener_->get_params();
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR(this->get_logger(), "Exception: %s", e.what());
+    }
     // NOLINTBEGIN
 
     using namespace std::placeholders;
-    auto action_name = std::string(this->get_name()) + "/fibonacci";
 
     this->action_server_ = rclcpp_action::create_server<Fibonacci>(
         this->get_node_base_interface(), this->get_node_clock_interface(),
         this->get_node_logging_interface(),
-        this->get_node_waitables_interface(), action_name,
+        this->get_node_waitables_interface(), params_.action_name,
 
         std::bind(&MinimalActionServer::handle_goal_, this, _1, _2),
         std::bind(&MinimalActionServer::handle_cancel_, this, _1),
@@ -36,6 +44,9 @@ public:
   }
 
 private:
+  Params params_;
+  std::shared_ptr<ParamListener> param_listener_;
+
   rclcpp_action::Server<Fibonacci>::SharedPtr action_server_;
 
   auto handle_goal_(const rclcpp_action::GoalUUID &uuid,

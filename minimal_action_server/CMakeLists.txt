@@ -13,11 +13,16 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   rclcpp_action
   example_interfaces
+  generate_parameter_library
 )
 
 foreach(dependency ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${dependency} REQUIRED)
 endforeach()
+
+generate_parameter_library(minimal_action_server_params
+  "src/minimal_action_server_parameters.yaml"
+)
 
 
 add_library(minimal_action_server SHARED)# src/minimal_action_server.cpp)
@@ -28,6 +33,7 @@ target_include_directories(minimal_action_server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(minimal_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(minimal_action_server minimal_action_server_params)
 
 add_executable(minimal_action_server_node)
 target_sources(minimal_action_server_node PRIVATE src/minimal_action_server_node.cpp)
@@ -43,7 +49,9 @@ install(
   DESTINATION include
 )
 install(
-  TARGETS minimal_action_server
+  TARGETS 
+    minimal_action_server
+    minimal_action_server_params
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -52,6 +60,12 @@ install(
 install(
   TARGETS minimal_action_server_node
   RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+
+install(
+  DIRECTORY config launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
