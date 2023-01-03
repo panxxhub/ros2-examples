@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "colcon_build",
+			"detail": "Build workspace",
+			"type": "shell",
+			"command": "./build.sh",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "test",
+			"detail": "Run all unit tests and show results.",
+			"type": "shell",
+			"command": "./test.sh",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		},
+	]
+}
