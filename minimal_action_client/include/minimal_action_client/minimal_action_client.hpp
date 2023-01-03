@@ -14,12 +14,15 @@ public:
   using GoalHandleFibonacci = rclcpp_action::ClientGoalHandle<Fibonacci>;
 
   explicit MinimalActionClient(
+      const std::string &action_name = "fibonacci",
+      const std::string &node_name = "minimal_action_client",
       const rclcpp::NodeOptions &node_options = rclcpp::NodeOptions())
-      : Node("minimal_action_client", node_options), goal_done_(false) {
+      : Node(node_name, node_options) {
+
     this->client_ptr_ = rclcpp_action::create_client<Fibonacci>(
         this->get_node_base_interface(), this->get_node_graph_interface(),
         this->get_node_logging_interface(),
-        this->get_node_waitables_interface(), "fibonacci");
+        this->get_node_waitables_interface(), action_name);
 
     this->timer_ = this->create_wall_timer(std::chrono::milliseconds(500),
                                            [this] { send_goal(); });
@@ -28,7 +31,6 @@ public:
   auto is_goal_done() const -> bool { return this->goal_done_; }
 
   void send_goal() {
-    using namespace std::placeholders;
 
     this->timer_->cancel();
 
@@ -69,7 +71,7 @@ public:
 private:
   rclcpp_action::Client<Fibonacci>::SharedPtr client_ptr_;
   rclcpp::TimerBase::SharedPtr timer_;
-  bool goal_done_;
+  bool goal_done_{};
 
   void goal_response_callback_(GoalHandleFibonacci::SharedPtr goal_handle) {
     if (!goal_handle) {

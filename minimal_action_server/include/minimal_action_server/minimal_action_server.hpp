@@ -21,11 +21,12 @@ public:
     // NOLINTBEGIN
 
     using namespace std::placeholders;
+    auto action_name = std::string(this->get_name()) + "/fibonacci";
 
     this->action_server_ = rclcpp_action::create_server<Fibonacci>(
         this->get_node_base_interface(), this->get_node_clock_interface(),
         this->get_node_logging_interface(),
-        this->get_node_waitables_interface(), "fibonacci",
+        this->get_node_waitables_interface(), action_name,
 
         std::bind(&MinimalActionServer::handle_goal_, this, _1, _2),
         std::bind(&MinimalActionServer::handle_cancel_, this, _1),
